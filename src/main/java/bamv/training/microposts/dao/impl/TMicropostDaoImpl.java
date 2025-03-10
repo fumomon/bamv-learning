@@ -35,14 +35,14 @@ public class TMicropostDaoImpl implements TMicropostDao {
                     SELECT
                         tm.*
                     FROM
-                        t_micropost tm
+                        t_micropost tm inner join t_follow tf on tm.user_id = tf.user_id
                     WHERE
-                        tm.user_id = ?
+                        tm.user_id = ? or tf.following_user_id = ? 
                     ORDER BY
                         tm.posted_datetime desc, tm.micropost_id desc
                     limit ?, 2
                 """;
-        return jdbcTemplate.query(query, rowMapper, userId, offset);
+        return jdbcTemplate.query(query, rowMapper, userId, userId,offset);
     }
 
     @Override
