@@ -1,14 +1,7 @@
 package bamv.training.microposts.controller;
 
-import bamv.training.microposts.dto.MicropostDto;
-import bamv.training.microposts.dto.UserDto;
-import bamv.training.microposts.form.MicropostForm;
-import bamv.training.microposts.form.UserForm;
-import bamv.training.microposts.service.FollowService;
-import bamv.training.microposts.service.MicropostService;
-import bamv.training.microposts.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,93 +11,152 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
+import bamv.training.microposts.dto.MicropostDto;
+import bamv.training.microposts.dto.UserDto;
+import bamv.training.microposts.entity.MUser;
+import bamv.training.microposts.form.MicropostForm;
+import bamv.training.microposts.form.UserForm;
+import bamv.training.microposts.service.FollowService;
+import bamv.training.microposts.service.MicropostService;
+import bamv.training.microposts.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @Controller
 public class MicropostsController {
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Autowired
-    private MicropostService micropostService;
+	@Autowired
+	private MicropostService micropostService;
 
-    @Autowired
-    private FollowService followService;
+	@Autowired
+	private FollowService followService;
 
-    @GetMapping("/micropostshome")
-    String micropostshome(Model model, @ModelAttribute MicropostForm micropostForm, BindingResult bindingResult, HttpServletRequest httpServletRequest, @RequestParam(name = "page", defaultValue = "1") int page) {
-        /* ユーザー認証情報からユーザIDを取得 */
-        String userId = httpServletRequest.getRemoteUser();
+	@GetMapping("/micropostshome")
+	String micropostshome(Model model, @ModelAttribute MicropostForm micropostForm, BindingResult bindingResult,
+			HttpServletRequest httpServletRequest, @RequestParam(name = "page", defaultValue = "1") int page) {
+		/* ユーザー認証情報からユーザIDを取得 */
+		String userId = httpServletRequest.getRemoteUser();
 
-        /* Model ⇔ Controller */
-        UserDto user = userService.findUser(userId); // 自ユーザー情報
-        int myMicropostNumber = micropostService.countMicropostNumber(userId); // 自ユーザーマイクロポスト数
-        List<MicropostDto> followsMicropostList = micropostService.searchFollowMicropost(userId, page); // 自ユーザーおよびフォローのマイクロポスト
-        int myFollowNumber = followService.findFollowNumber(userId); // 自ユーザーのフォロー数
-        int myFollowerNumber = followService.findFollowerNumber(userId); // 自ユーザーのフォロワー数
+		/* Model ⇔ Controller */
+		UserDto user = userService.findUser(userId); // 自ユーザー情報
+		int myMicropostNumber = micropostService.countMicropostNumber(userId); // 自ユーザーマイクロポスト数
+		List<MicropostDto> followsMicropostList = micropostService.searchFollowMicropost(userId, page); // 自ユーザーおよびフォローのマイクロポスト
+		int myFollowNumber = followService.findFollowNumber(userId); // 自ユーザーのフォロー数
+		int myFollowerNumber = followService.findFollowerNumber(userId); // 自ユーザーのフォロワー数
 
-        /* View ⇔ Controller */
-        model.addAttribute("myUserName", user.getName());
-        model.addAttribute("myMicropostsNumber", myMicropostNumber);
-        model.addAttribute("myFollowNumber", myFollowNumber);
-        model.addAttribute("myFollowerNumber", myFollowerNumber);
-        model.addAttribute("followsMicropostList", followsMicropostList);
-        model.addAttribute("page", page);
+		/* View ⇔ Controller */
+		model.addAttribute("myUserName", user.getName());
+		model.addAttribute("myMicropostsNumber", myMicropostNumber);
+		model.addAttribute("myFollowNumber", myFollowNumber);
+		model.addAttribute("myFollowerNumber", myFollowerNumber);
+		model.addAttribute("followsMicropostList", followsMicropostList);
+		model.addAttribute("page", page);
 
-        return "micropostshome";
-    }
+		return "micropostshome";
+	}
 
-    @PostMapping("/postnewmicropost")
-    String postnewmicropost(Model model, HttpServletRequest httpServletRequest, @ModelAttribute @Valid MicropostForm micropostForm, BindingResult bindingResult) {
-        /* ユーザー認証情報からユーザIDを取得 */
-        String userId = httpServletRequest.getRemoteUser();
+	@PostMapping("/postnewmicropost")
+	String postnewmicropost(Model model, HttpServletRequest httpServletRequest,
+			@ModelAttribute @Valid MicropostForm micropostForm, BindingResult bindingResult) {
+		/* ユーザー認証情報からユーザIDを取得 */
+		String userId = httpServletRequest.getRemoteUser();
 
-        if (bindingResult.hasErrors())
-            return micropostshome(model, micropostForm, bindingResult, httpServletRequest, 1);
+		if (bindingResult.hasErrors())
+			return micropostshome(model, micropostForm, bindingResult, httpServletRequest, 1);
 
-        micropostService.createNewMicropost(userId, micropostForm.getContent());
+		micropostService.createNewMicropost(userId, micropostForm.getContent());
 
-        return "redirect:/micropostshome";
-    }
+		return "redirect:/micropostshome";
+	}
 
-    @GetMapping("/login")
-    String login(Model model) {
-        return "login";
-    }
+	@GetMapping("/login")
+	String login(Model model) {
+		return "login";
+	}
 
-    @GetMapping("/myprofile")
-    String myprofile(Model model, HttpServletRequest httpServletRequest, @RequestParam(name = "page", defaultValue = "1") int page) {
-        /* ユーザー認証情報からユーザIDを取得 */
-        String userId = httpServletRequest.getRemoteUser();
+	@GetMapping("/myprofile")
+	String myprofile(Model model, HttpServletRequest httpServletRequest,
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+		/* ユーザー認証情報からユーザIDを取得 */
+		String userId = httpServletRequest.getRemoteUser();
 
-        /* Model ⇔ Controller */
-        UserDto user = userService.findUser(userId); // 自ユーザー情報
-        List<MicropostDto> followsMicropostList = micropostService.searchUserMicropost(userId, page); // 自ユーザーのマイクロポスト
-        int myFollowNumber = followService.findFollowNumber(userId); // 自ユーザーのフォロー数
-        int myFollowerNumber = followService.findFollowerNumber(userId); // 自ユーザーのフォロワー数
+		/* Model ⇔ Controller */
+		UserDto user = userService.findUser(userId); // 自ユーザー情報
+		List<MicropostDto> followsMicropostList = micropostService.searchUserMicropost(userId, page); // 自ユーザーのマイクロポスト
+		int myFollowNumber = followService.findFollowNumber(userId); // 自ユーザーのフォロー数
+		int myFollowerNumber = followService.findFollowerNumber(userId); // 自ユーザーのフォロワー数
 
-        /* View ⇔ Controller */
-        model.addAttribute("myUserName", user.getName());
-        model.addAttribute("myFollowNumber", myFollowNumber);
-        model.addAttribute("myFollowerNumber", myFollowerNumber);
-        model.addAttribute("followsMicropostList", followsMicropostList);
-        model.addAttribute("page", page);
+		/* View ⇔ Controller */
+		model.addAttribute("myUserName", user.getName());
+		model.addAttribute("myFollowNumber", myFollowNumber);
+		model.addAttribute("myFollowerNumber", myFollowerNumber);
+		model.addAttribute("followsMicropostList", followsMicropostList);
+		model.addAttribute("page", page);
 
-        return "myprofile";
-    }
+		return "myprofile";
+	}
 
-    @GetMapping("/signup")
-    String signup(Model model, @ModelAttribute UserForm userForm, BindingResult bindingResult) {
-        return "signup";
-    }
+	@GetMapping("/signup")
+	String signup(Model model, @ModelAttribute UserForm userForm, BindingResult bindingResult) {
+		return "signup";
+	}
 
-    @PostMapping("/signup")
-    String postsignup(Model model, @ModelAttribute @Valid UserForm userForm, BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            return signup(model, userForm, bindingResult);
+	@PostMapping("/signup")
+	String postsignup(Model model, @ModelAttribute @Valid UserForm userForm, BindingResult bindingResult) {
+		if (bindingResult.hasErrors())
+			return signup(model, userForm, bindingResult);
 
-        userService.createNewUser(userForm.getUserId(), userForm.getUserName(), userForm.getPassword());
+		userService.createNewUser(userForm.getUserId(), userForm.getUserName(), userForm.getPassword());
 
-        return "redirect:/login";
-    }
+		return "redirect:/login";
+	}
+
+	@GetMapping("/userlist")
+	public String userList(Model model, HttpServletRequest httpServletRequest,
+			@RequestParam(name = "page", defaultValue = "1") int page) {
+
+		/* ユーザー認証情報からユーザIDを取得 */
+		String userId = httpServletRequest.getRemoteUser();
+
+		List<MUser> userList = userService.getUsersExceptMe(userId,page);
+		List<String> followingIds = followService.getFollowingIds(userId);
+		UserDto user = userService.findUser(userId);
+		int myFollowNumber = followService.findFollowNumber(userId);
+		int myFollowerNumber = followService.findFollowerNumber(userId);
+
+		model.addAttribute("myUserName", user.getName());
+		model.addAttribute("myFollowNumber", myFollowNumber);
+		model.addAttribute("myFollowerNumber", myFollowerNumber);
+		model.addAttribute("userList", userList);
+		model.addAttribute("followingIds", followingIds);
+		model.addAttribute("page", page);
+
+		return "userlist";
+	}
+
+	@PostMapping("/follow")
+	public String followUser(HttpServletRequest httpServletRequest,
+			@RequestParam(name = "followedUserId") String followedUserId) {
+
+		/* ユーザー認証情報からユーザIDを取得 */
+		String userId = httpServletRequest.getRemoteUser();
+
+		followService.follow(userId, followedUserId);
+
+		return "redirect:/userlist";
+	}
+
+	@PostMapping("/unfollow")
+	public String unfollowUser(HttpServletRequest httpServletRequest,
+			@RequestParam(name = "unfollowedUserId") String unfollowedUserId) {
+
+		/* ユーザー認証情報からユーザIDを取得 */
+		String userId = httpServletRequest.getRemoteUser();
+		followService.unfollow(userId, unfollowedUserId);
+
+		return "redirect:/userlist";
+	}
+
 }

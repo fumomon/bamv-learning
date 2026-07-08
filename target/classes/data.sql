@@ -31,6 +31,16 @@ WHERE
         SELECT 1 FROM t_follow WHERE follow_id='FL00000001'
     );
 
+INSERT INTO t_follow
+SELECT
+    'FL00000002'
+     , 'user1'
+     , 'US00000001'
+    WHERE
+    NOT EXISTS (
+        SELECT 1 FROM t_follow WHERE follow_id='FL00000002'
+    );
+
 /* t_microposts */
 INSERT INTO t_micropost
 SELECT
@@ -73,4 +83,14 @@ SELECT
 WHERE
     NOT EXISTS (
         SELECT 1 FROM m_sequence WHERE id_name ='micropost_id'
+    );
+    
+    INSERT INTO m_sequence
+SELECT
+    'follow_id'
+    , 'FL'
+    , 100
+WHERE
+    NOT EXISTS (
+        SELECT 1 FROM m_sequence WHERE id_name ='follow_id'
     );

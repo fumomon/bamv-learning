@@ -1,16 +1,17 @@
 package bamv.training.microposts.dao.impl;
 
-import bamv.training.microposts.dao.TMicropostDao;
-import bamv.training.microposts.entity.TMicropost;
-import bamv.training.microposts.service.SequenceService;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import bamv.training.microposts.dao.TMicropostDao;
+import bamv.training.microposts.entity.TMicropost;
+import bamv.training.microposts.service.SequenceService;
 
 @Repository
 public class TMicropostDaoImpl implements TMicropostDao {
@@ -32,17 +33,17 @@ public class TMicropostDaoImpl implements TMicropostDao {
         int offset = 2 * (page - 1);
 
         String query = """
-                    SELECT
-                        tm.*
-                    FROM
-                        t_micropost tm inner join t_follow tf on tm.user_id = tf.user_id
-                    WHERE
-                        tm.user_id = ? or tf.following_user_id = ? 
-                    ORDER BY
-                        tm.posted_datetime desc, tm.micropost_id desc
-                    limit ?, 2
-                """;
-        return jdbcTemplate.query(query, rowMapper, userId, userId,offset);
+                SELECT
+                    tm.*
+                FROM
+                    t_micropost tm
+                WHERE
+                    tm.user_id = ?
+                ORDER BY
+                    tm.posted_datetime desc, tm.micropost_id desc
+                limit ?, 2
+            """;
+        return jdbcTemplate.query(query, rowMapper,  userId,offset);
     }
 
     @Override
