@@ -19,7 +19,7 @@ WHERE
     NOT EXISTS (
         SELECT 1 FROM m_user WHERE user_id='US00000002'
     );
-
+ 
 /* t_follow */
 INSERT INTO t_follow
 SELECT

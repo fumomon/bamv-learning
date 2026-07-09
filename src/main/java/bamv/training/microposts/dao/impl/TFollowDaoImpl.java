@@ -30,7 +30,7 @@ public class TFollowDaoImpl implements TFollowDao {
 		String query = "INSERT INTO t_follow (follow_id, following_user_id, followed_user_id) VALUES (?, ?, ?)";
 		return jdbcTemplate.update(query, followId, userId, followedUserId);
 	}
-
+ 
 	@Override
 	public void deleteFollow(String userId, String followedUserId) {
 		String sql = """

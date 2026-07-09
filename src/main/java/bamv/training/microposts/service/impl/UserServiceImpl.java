@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public int createNewUser(String userId, String name, String password) {
         return mUserDao.addNewUser(userId, name, password);
-    }
+    } 
     
     @Override
     public List<MUser> getUsersExceptMe(String userId,int page) {

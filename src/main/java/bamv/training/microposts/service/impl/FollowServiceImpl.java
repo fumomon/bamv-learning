@@ -28,7 +28,7 @@ public class FollowServiceImpl implements FollowService {
     @Override
     public int findFollowerNumber(String userId) {
         return tFollowDao.countFollowerNumber(userId);
-    }
+    } 
     
     @Transactional 
     @Override

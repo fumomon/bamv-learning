@@ -10,6 +10,6 @@ public interface UserService {
 
     int createNewUser(String userId, String name, String password);
     
-    List<MUser> getUsersExceptMe(String userId,int page);
+    List<MUser> getUsersExceptMe(String userId,int page); 
     
 }

@@ -96,7 +96,7 @@ public class MicropostsController {
 		model.addAttribute("page", page);
 
 		return "myprofile";
-	}
+	} 
 
 	@GetMapping("/signup")
 	String signup(Model model, @ModelAttribute UserForm userForm, BindingResult bindingResult) {
